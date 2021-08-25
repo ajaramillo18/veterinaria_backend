@@ -78,7 +78,7 @@ public class ClientController {
 		List<Client> clientList = clientService.getClients();					
 		model.addAttribute("cliente", clientList);
 		if(clientList.isEmpty()) 
-			throw new StudentNotFoundException("No hay clientes registrados");
+			throw new StudentNotFoundException("No hay clientes registrados. Registre uno para hacer el listado");
 		return clientList;
 	}
 
