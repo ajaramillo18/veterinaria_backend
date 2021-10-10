@@ -1,6 +1,12 @@
 package com.jama.api.controller;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.ui.Model;
@@ -13,15 +19,21 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.supercsv.io.CsvBeanWriter;
+import org.supercsv.io.ICsvBeanWriter;
+import org.supercsv.prefs.CsvPreference;
 
+import com.jama.api.dao.ClientDAO;
+import com.jama.api.dao.PetDAO;
 import com.jama.api.exception.StudentNotFoundException;
+import com.jama.api.model.Client;
 import com.jama.api.model.Pet;
 import com.jama.api.service.PetService;
 import com.jama.api.service.PetServiceImpl;
 //
 
-@CrossOrigin("*") 
-@RestController 
+@CrossOrigin("*")
+@RestController
 @RequestMapping("/pets")
 public class PetController {
 	
@@ -29,7 +41,9 @@ public class PetController {
 	private PetService petService;
 	
 	@Autowired
-	private PetServiceImpl petServiceImpl;
+	private PetDAO petDao;
+	
+
 	
 	
 	@PostMapping(value = "/savePet", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -81,4 +95,40 @@ public class PetController {
 		return petsList;
 	}
 	
+	@GetMapping("/download/pet-report")
+    public void downloadExcel(HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.ms-excel");
+        response.setHeader("Content-Disposition", "attachment; filename=Mascotas.xlsx");
+        ByteArrayInputStream stream = petService.petListToExcelFile(createPetData());
+        IOUtils.copy(stream, response.getOutputStream());
+        System.out.println("Reporte de excel descargado correctamente..........."); 
+    }
+	
+	private List<Pet> createPetData() {
+		List<Pet> pets =  petDao.findAll();
+    	return pets;
+	}
+	
+	@GetMapping("/downloadCsv")
+    public void downloadCsv(HttpServletResponse response) throws IOException {
+		try { 
+	        response.setContentType("text/csv");
+	        response.setHeader("Content-Disposition", "attachment; filename=Mascotas.csv");
+	        // write to csv file //
+	        ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(),CsvPreference.STANDARD_PREFERENCE);
+	        String[]  headings = {"mascotaId","nombre","cliente_Id","especie","raza","color","nacimiento","sexo","esterilizado","estatus"};;
+	        String[] pojoclassPropertyName = {"mascotaId","nombre","clienteId","especie","raza","color","nacimiento","sexo","esterilizado","estatus"};;
+	        csvWriter.writeHeader(headings);
+	        List<Pet> PetList =createPetData();
+	        if(null!=PetList && !PetList.isEmpty()){
+	            for (Pet pet : PetList) {
+	                csvWriter.write(pet, pojoclassPropertyName);
+	              }
+	            }
+	        csvWriter.close();
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+        System.out.println("csv report downloaded successfully...........");
+    }
 }

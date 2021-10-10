@@ -1,5 +1,6 @@
 package com.jama.api.service;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import com.jama.api.model.Client;
@@ -17,7 +18,7 @@ public interface ClientService {
 	
 	public Client updateClient(Client client,Client BodyClient);
 	
-	
+	public  ByteArrayInputStream clientListToExcelFile(List<Client> client);
 //////////////////////////////////////
 	
 }

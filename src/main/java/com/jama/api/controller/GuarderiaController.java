@@ -1,11 +1,16 @@
 package com.jama.api.controller;
 
-import java.sql.Date;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,16 +18,19 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.supercsv.io.CsvBeanWriter;
+import org.supercsv.io.ICsvBeanWriter;
+import org.supercsv.prefs.CsvPreference;
 
+import com.jama.api.dao.GuarderiaDAO;
 import com.jama.api.exception.StudentNotFoundException;
-import com.jama.api.model.Consulta;
 import com.jama.api.model.Guarderia;
 import com.jama.api.model.Pet;
-import com.jama.api.service.ConsultaService;
 import com.jama.api.service.GuarderiaService;
 import com.jama.api.service.GuarderiaServiceImpl;
 import com.jama.api.service.PetService;
 
+@CrossOrigin("*")
 @RestController 
 @RequestMapping("/guarderia")
 public class GuarderiaController {
@@ -30,6 +38,9 @@ public class GuarderiaController {
 	
 	@Autowired
 	private PetService petService;
+	
+	@Autowired
+	private GuarderiaDAO guarderiaDao;
 	
 	@Autowired
 	private GuarderiaService guarderiaService;
@@ -58,7 +69,6 @@ public class GuarderiaController {
 		else 
 			guarderiaSaved = guarderiaService.updateGuarderia(guarderia,BodyGuarderia);
 		return guarderiaSaved;		
-		
 	}
 	
 	@GetMapping("/listGuarderias")//listado general
@@ -85,4 +95,40 @@ public class GuarderiaController {
 		return guarderiaList;
 	}
 	
+	@GetMapping("/download/guarderia-report")
+    public void downloadExcel(HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.ms-excel");
+        response.setHeader("Content-Disposition", "attachment; filename=Guarderias.xlsx");
+        ByteArrayInputStream stream = guarderiaService.guarderiaListToExcelFile(createGuarderiaData());
+        IOUtils.copy(stream, response.getOutputStream());
+        System.out.println("Reporte de excel descargado correctamente..........."); 
+    }
+	
+	private List<Guarderia> createGuarderiaData() {
+		List<Guarderia> guarderia =  guarderiaDao.findAll();
+    	return guarderia;
+	}
+	
+	@GetMapping("/downloadCsv")
+    public void downloadCsv(HttpServletResponse response) throws IOException {
+		try { 
+	        response.setContentType("text/csv");
+	        response.setHeader("Content-Disposition", "attachment; filename=Guarderia.csv");
+	        // write to csv file //
+	        ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(),CsvPreference.STANDARD_PREFERENCE);
+	        String[]  headings = {"guarderiaId","mascotaId","fecha_llegada","fecha_salida","cubiculo"};;
+	        String[] pojoclassPropertyName = {"guarderiaId","mascotaId","fechallegada","fechasalida","cubiculo"};;
+	        csvWriter.writeHeader(headings);
+	        List<Guarderia> guarderiaList =createGuarderiaData();
+	        if(null!=guarderiaList && !guarderiaList.isEmpty()){
+	            for (Guarderia guarderia : guarderiaList) {
+	                csvWriter.write(guarderia, pojoclassPropertyName);
+	              }
+	            }
+	        csvWriter.close();
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+        System.out.println("csv report downloaded successfully...........");
+    }
 }

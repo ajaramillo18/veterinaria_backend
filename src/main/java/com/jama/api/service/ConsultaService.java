@@ -1,10 +1,12 @@
 package com.jama.api.service;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.jama.api.model.Consulta;
+import com.jama.api.model.Guarderia;
 import com.jama.api.model.Pet;
 
 public interface ConsultaService {
@@ -17,6 +19,8 @@ public interface ConsultaService {
 	public Consulta updateConsulta(Consulta consulta,Consulta BodyConsulta);
 
 	public List<Consulta> getConsultas();
+	
+	public  ByteArrayInputStream consultaListToExcelFile(List<Consulta> list);
 	
 	
 //////////////////////////////////////
