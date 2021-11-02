@@ -45,19 +45,19 @@ public class Client {
 	private String Nombre;
 	
 	@Column(name = "Apellido_Paterno")
-	private String ApellidoPaterno;
+	private String apellidoPaterno;
 	
 	@Column(name = "Apellido_Materno")
-	private String ApellidoMaterno;
+	private String apellidoMaterno;
 	
     @Column(name = "Correo")
-	private String Correo;
+	private String correo;
 
 	@Column(name = "Telefono")
-	private String Telefono;
+	private String telefono;
 
 	@Column(name = "Direccion")
-	private String Direccion;
+	private String direccion;
 
 	@Column(name = "estatus")
 	private char estatus;
@@ -83,43 +83,43 @@ public class Client {
 	}
 
 	public String getApellidoPaterno() {
-		return ApellidoPaterno;
+		return apellidoPaterno;
 	}
 
 	public void setApellidoPaterno(String apellidoPaterno) {
-		ApellidoPaterno = apellidoPaterno;
+		this.apellidoPaterno = apellidoPaterno;
 	}
 
 	public String getApellidoMaterno() {
-		return ApellidoMaterno;
+		return apellidoMaterno;
 	}
 
 	public void setApellidoMaterno(String apellidoMaterno) {
-		ApellidoMaterno = apellidoMaterno;
+		this.apellidoMaterno = apellidoMaterno;
 	}
 
 	public String getCorreo() {
-		return Correo;
+		return correo;
 	}
 
 	public void setCorreo(String correo) {
-		Correo = correo;
+		this.correo = correo;
 	}
 
 	public String getTelefono() {
-		return Telefono;
+		return telefono;
 	}
 
 	public void setTelefono(String telefono) {
-		Telefono = telefono;
+		this.telefono = telefono;
 	}
 
 	public String getDireccion() {
-		return Direccion;
+		return direccion;
 	}
 
 	public void setDireccion(String direccion) {
-		Direccion = direccion;
+		this.direccion = direccion;
 	}
 
 	public char getEstatus() {

@@ -121,6 +121,12 @@ public class ClientServiceImpl implements ClientService{
 		}
 	}
 
+	@Override
+	public List<Client> searchClientsByLastName(String lastName) {
+		List<Client> client =  clientDao.getAllByApellidoPaternoContaining(lastName);
+		return client;	
+	}
+
 
 	
 }

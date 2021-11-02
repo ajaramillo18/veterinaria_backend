@@ -20,5 +20,7 @@ public interface ClientService {
 	
 	public  ByteArrayInputStream clientListToExcelFile(List<Client> client);
 //////////////////////////////////////
+
+	public List<Client> searchClientsByLastName(String lastName);
 	
 }

@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.supercsv.io.CsvBeanWriter;
 import org.supercsv.io.ICsvBeanWriter;
@@ -49,14 +51,14 @@ public class ClientController {
 	private PetService petService;
 	
 	@PostMapping(value = "/saveClient", consumes = MediaType.APPLICATION_JSON_VALUE)//guardar nuevo cliente
-	public Client savePet(@RequestBody Client client)
+	public Client saveClient(@RequestBody Client client)
 	{
 		Client clientSaved = clientService.save(client);
 		return clientSaved;
 	}
 
-	@PutMapping("/updateClient")//modificar cliente
-	public Client updatePet(@RequestBody Client BodyClient) {
+	@PutMapping(value = "/updateClient", consumes = MediaType.APPLICATION_JSON_VALUE)//modificar cliente
+	public Client updateClient(@RequestBody Client BodyClient) {
 		Client clientSaved;
 		Client client = clientService.getClient(BodyClient.getClienteId());
 		if (client == null)
@@ -68,16 +70,17 @@ public class ClientController {
 	}
 
 	@DeleteMapping("/deleteClient/{clienteId}")//eliminar cliente
-	public String deleteClient(@PathVariable int clienteId) {
+	//@ResponseStatus(HttpStatus.OK)
+	public void deleteClient(@PathVariable int clienteId) {
 		Client client = clientService.getClient(clienteId);
 		if (client == null)
 			throw new StudentNotFoundException("Client id not found - " + clienteId);
 		else if(client!=null)
 			clientService.deleteClient(client,clienteId);
-		return "Cliente con id: " + clienteId + " ha sido borrado.";
+		//return "Cliente con id: " + clienteId + " ha sido borrado.";
 	}
 	
-	@GetMapping("/listClient/{clienteId}")//listado especifico
+	@GetMapping("/getClient/{clienteId}")//listado especifico
 	 public Client getClient(@PathVariable int clienteId){
 		 //client=null;
 		 Client client = clientService.getClient(clienteId);
@@ -147,4 +150,19 @@ public class ClientController {
         System.out.println("csv report downloaded successfully...........");
     }
 	
+	
+	@GetMapping(value ="/search", params="name")
+	 public List<Client> searchClients(@RequestParam(name="name") String name){
+		 
+		 List<Client> clientList = clientService.searchClientsByLastName(name);
+		 if(clientList.isEmpty()) 
+				throw new StudentNotFoundException("No hay clientes registrados.");
+		 return clientList;
+		/*if ("1".equals(name))		 
+			return "[{ \"clienteId\": \"1\", \"nombre\": \"Dantesco\", \"correo\": \"Dante@gmail.com\", \"telefono\": \"32123\", \"direccion\": \"Chandio\" }]";
+		else
+			return "[]";
+		 */
+		 
+	 }
 }
